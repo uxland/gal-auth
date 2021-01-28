@@ -1,7 +1,7 @@
 package http
 
 import (
-	"github.com/uxland/ga-go-auth/shared"
+	"github.com/uxland/gal-auth/shared"
 	"net/http"
 	"strings"
 )

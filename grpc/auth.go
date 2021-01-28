@@ -3,7 +3,7 @@ package grpc
 import (
 	"context"
 	"fmt"
-	"github.com/uxland/ga-go-auth/shared"
+	"github.com/uxland/gal-auth/shared"
 	"google.golang.org/grpc/metadata"
 )
 

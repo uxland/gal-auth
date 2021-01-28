@@ -2,7 +2,7 @@ package http
 
 import (
 	"fmt"
-	"github.com/uxland/ga-go-auth/shared"
+	"github.com/uxland/gal-auth/shared"
 	"net/http"
 )
 

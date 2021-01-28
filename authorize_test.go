@@ -2,8 +2,8 @@ package gal_auth
 
 import (
 	"context"
-	"github.com/uxland/ga-go-auth/grpc"
-	"github.com/uxland/ga-go-auth/shared"
+	"github.com/uxland/gal-auth/grpc"
+	"github.com/uxland/gal-auth/shared"
 	"google.golang.org/grpc/metadata"
 	"testing"
 	"time"

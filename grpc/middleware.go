@@ -3,7 +3,7 @@ package grpc
 import (
 	"context"
 	grpcAuth "github.com/grpc-ecosystem/go-grpc-middleware/auth"
-	"github.com/uxland/ga-go-auth/shared"
+	"github.com/uxland/gal-auth/shared"
 )
 
 func MiddlewareFactory(apiSecret, scheme shared.AuthenticationScheme) grpcAuth.AuthFunc {

@@ -3,7 +3,7 @@ package gal_auth
 import (
 	"context"
 	"github.com/stoewer/go-strcase"
-	"github.com/uxland/ga-go-auth/shared"
+	"github.com/uxland/gal-auth/shared"
 	"reflect"
 )
 

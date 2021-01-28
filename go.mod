@@ -1,4 +1,4 @@
-module github.com/uxland/ga-go-auth
+module github.com/uxland/gal-auth
 
 go 1.15
 
