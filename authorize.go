@@ -2,6 +2,7 @@ package gal_auth
 
 import (
 	"context"
+	"errors"
 	"github.com/stoewer/go-strcase"
 	"github.com/uxland/gal-auth/shared"
 	"reflect"
@@ -117,4 +118,28 @@ func GetIncomingUserID(ctx context.Context) string {
 	}
 	return id.(string)
 
+}
+
+func IsSuperUser(ctx context.Context) bool {
+	data := shared.GetContextData(ctx)
+	if data == nil {
+		return false
+	}
+	p, exists := getField(data, "payload")
+	if !exists {
+		return false
+	}
+
+	user := p.(map[string]interface{})
+	if user == nil {
+		return false
+	}
+	return isSuperUser(user)
+}
+
+func AssertIsSuperUser(ctx context.Context) error {
+	if !IsSuperUser(ctx) {
+		return errors.New("user is not super user")
+	}
+	return nil
 }
