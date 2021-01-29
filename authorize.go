@@ -102,3 +102,19 @@ func AssertRoleInProject(ctx context.Context, role, project string) error {
 func AssertIsAdminInProject(ctx context.Context, project string) error {
 	return AssertRoleInProject(ctx, AdminRole, project)
 }
+func GetIncomingUserID(ctx context.Context) string {
+	data := shared.GetContextData(ctx)
+	if data == nil {
+		return ""
+	}
+	p, exists := getField(data, "payload")
+	if !exists {
+		return ""
+	}
+	id, b := getField(p.(map[string]interface{}), "ID")
+	if !b {
+		return ""
+	}
+	return id.(string)
+
+}

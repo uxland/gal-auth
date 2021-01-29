@@ -26,6 +26,7 @@ type UserDataDTO struct {
 	IsSuperUser bool
 	AccessTo    map[string]ProjectSettings
 	Identities  map[string]Identity
+	ID          string
 }
 type Identity struct {
 	UserID      string
