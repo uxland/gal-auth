@@ -3,45 +3,21 @@ package gal_auth
 import (
 	"context"
 	"github.com/uxland/gal-auth/grpc"
+	"github.com/uxland/gal-auth/model"
 	"github.com/uxland/gal-auth/shared"
 	"google.golang.org/grpc/metadata"
 	"testing"
 	"time"
 )
 
-type ProjectSettings struct {
-	ID          string
-	Roles       []string
-	Properties  map[string]string
-	GrantedByID string
-	Date        time.Time
-}
-type Profile struct {
-	FullName  string
-	PhotoLink string
-}
-
-type UserDataDTO struct {
-	Profile     Profile
-	IsSuperUser bool
-	AccessTo    map[string]ProjectSettings
-	Identities  map[string]Identity
-	ID          string
-}
-type Identity struct {
-	UserID      string
-	ProviderID  string
-	DisplayName string
-}
-
-func createUser() UserDataDTO {
-	user := UserDataDTO{
-		Profile: Profile{
+func createUser() model.UserData {
+	user := model.UserData{
+		Profile: model.Profile{
 			FullName:  "test user",
 			PhotoLink: "http://cnd.test.jpg",
 		},
 		IsSuperUser: false,
-		AccessTo: map[string]ProjectSettings{
+		AccessTo: map[string]model.ProjectSettings{
 			"p1": {
 				Roles:       []string{"operator"},
 				Date:        time.Now(),
@@ -53,7 +29,7 @@ func createUser() UserDataDTO {
 				GrantedByID: "god",
 			},
 		},
-		Identities: map[string]Identity{
+		Identities: map[string]model.Identity{
 			"SAP": {UserID: "tt", ProviderID: "SAP"},
 		},
 	}
@@ -64,9 +40,9 @@ const (
 	testApiSecret = "my-api-secret"
 )
 
-func setContext(user *UserDataDTO) (context.Context, error) {
+func setContext(user *model.UserData) (context.Context, error) {
 	middleware := grpc.MiddlewareFactory(testApiSecret, shared.BearerSchema)
-	tokenFactory := shared.TokenFactory(testApiSecret)
+	tokenFactory := shared.TokenFactory(testApiSecret, time.Hour)
 
 	payload, err := tokenFactory(user)
 	if err != nil {

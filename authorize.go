@@ -3,12 +3,12 @@ package gal_auth
 import (
 	"context"
 	"errors"
+	"fmt"
 	"github.com/stoewer/go-strcase"
+	"github.com/uxland/gal-auth/model"
 	"github.com/uxland/gal-auth/shared"
 	"reflect"
 )
-
-const AdminRole = "admin"
 
 type caseConverter = func(string) string
 
@@ -36,9 +36,32 @@ func getField(data map[string]interface{}, fieldName string) (interface{}, bool)
 	return nil, false
 }
 
-func isSuperUser(user map[string]interface{}) bool {
-	value, exists := user["IsSuperUser"]
+func getUserData(ctx context.Context) (*model.UserData, map[string]interface{}, bool) {
+	u := shared.GetContextUser(ctx)
+	if u != nil {
+		return u, nil, true
+	}
+	data := shared.GetContextData(ctx)
+	if data == nil {
+		return nil, nil, false
+	}
+	p, exists := getField(data, "user")
 	if !exists {
+		return nil, nil, false
+	}
+	user := p.(map[string]interface{})
+	if user == nil {
+		return nil, nil, false
+	}
+	return nil, user, true
+}
+
+func isSuperUser(user *model.UserData, mapUser map[string]interface{}) bool {
+	if user != nil {
+		return user.IsSuperUser
+	}
+	value, b := getField(mapUser, "IsSuperUser")
+	if !b {
 		return false
 	}
 	if tp := reflect.TypeOf(value); tp.AssignableTo(reflect.TypeOf(true)) {
@@ -48,24 +71,18 @@ func isSuperUser(user map[string]interface{}) bool {
 }
 
 func IsRoleInProject(ctx context.Context, role, project string) bool {
-	data := shared.GetContextData(ctx)
-	if data == nil {
-		return false
-	}
-	p, exists := getField(data, "payload")
+	user, mapUser, exists := getUserData(ctx)
 	if !exists {
 		return false
 	}
 
-	user := p.(map[string]interface{})
-	if user == nil {
-		return false
-	}
-	if isSuperUser(user) {
+	if isSuperUser(user, mapUser) {
 		return true
 	}
-
-	access, exists := getField(user, "AccessTo")
+	if user != nil {
+		return user.IsRoleInProject(project, role)
+	}
+	access, exists := getField(mapUser, "AccessTo")
 	if !exists {
 		return false
 	}
@@ -91,7 +108,7 @@ func IsRoleInProject(ctx context.Context, role, project string) bool {
 
 }
 func IsAdminInProject(ctx context.Context, project string) bool {
-	return IsRoleInProject(ctx, AdminRole, project)
+	return IsRoleInProject(ctx, model.AdminRole, project)
 }
 
 func AssertRoleInProject(ctx context.Context, role, project string) error {
@@ -101,18 +118,17 @@ func AssertRoleInProject(ctx context.Context, role, project string) error {
 	return nil
 }
 func AssertIsAdminInProject(ctx context.Context, project string) error {
-	return AssertRoleInProject(ctx, AdminRole, project)
+	return AssertRoleInProject(ctx, model.AdminRole, project)
 }
 func GetIncomingUserID(ctx context.Context) string {
-	data := shared.GetContextData(ctx)
-	if data == nil {
+	user, mapUser, found := getUserData(ctx)
+	if !found {
 		return ""
 	}
-	p, exists := getField(data, "payload")
-	if !exists {
-		return ""
+	if user != nil {
+		return user.ID
 	}
-	id, b := getField(p.(map[string]interface{}), "ID")
+	id, b := getField(mapUser, "ID")
 	if !b {
 		return ""
 	}
@@ -120,21 +136,23 @@ func GetIncomingUserID(ctx context.Context) string {
 
 }
 
-func IsSuperUser(ctx context.Context) bool {
-	data := shared.GetContextData(ctx)
-	if data == nil {
-		return false
+func GetIncomingUserDescription(ctx context.Context) string {
+	u, _, b := getUserData(ctx)
+	if !b {
+		return ""
 	}
-	p, exists := getField(data, "payload")
-	if !exists {
-		return false
+	if u != nil {
+		return u.String()
 	}
+	return fmt.Sprintf("ID: %s", GetIncomingUserID(ctx))
+}
 
-	user := p.(map[string]interface{})
-	if user == nil {
+func IsSuperUser(ctx context.Context) bool {
+	user, mapUser, b := getUserData(ctx)
+	if !b {
 		return false
 	}
-	return isSuperUser(user)
+	return isSuperUser(user, mapUser)
 }
 
 func AssertIsSuperUser(ctx context.Context) error {
@@ -142,4 +160,14 @@ func AssertIsSuperUser(ctx context.Context) error {
 		return errors.New("user is not super user")
 	}
 	return nil
+}
+
+type Identity struct {
+	UserID      string
+	ProviderID  string
+	DisplayName string
+}
+type UserInfo struct {
+	ID          string
+	IsSuperUser string
 }
