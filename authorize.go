@@ -161,13 +161,3 @@ func AssertIsSuperUser(ctx context.Context) error {
 	}
 	return nil
 }
-
-type Identity struct {
-	UserID      string
-	ProviderID  string
-	DisplayName string
-}
-type UserInfo struct {
-	ID          string
-	IsSuperUser string
-}
