@@ -16,7 +16,7 @@ type Identity struct {
 type ProjectSettings struct {
 	ID          string
 	Roles       []string
-	Properties  map[string]string
+	Properties  StringMap
 	GrantedByID string
 	Date        time.Time
 }
@@ -27,11 +27,12 @@ type Profile struct {
 }
 
 type UserData struct {
-	ID          string
-	Profile     Profile
-	IsSuperUser bool
-	AccessTo    map[string]ProjectSettings
-	Identities  map[string]Identity
+	ID            string
+	Profile       Profile
+	IsSuperUser   bool
+	AccessTo      ProjectSettingsMap
+	Identities    IdentityMap
+	XXXIdentities []string
 }
 
 type TokenData struct {
