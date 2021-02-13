@@ -40,7 +40,7 @@ type TokenData struct {
 }
 
 func (u *UserData) String() string {
-	return fmt.Sprintf("ID: %s; IsSuperdUser: %t; Identities: %#v", u.ID, u.IsSuperUser, u.Identities)
+	return fmt.Sprintf("ID: %s; IsSuperdUser: %t; Identities: %+v", u.ID, u.IsSuperUser, u.Identities)
 }
 func (u *UserData) IsRoleInProject(projectID string, role string) bool {
 	ps, found := u.AccessTo[projectID]
