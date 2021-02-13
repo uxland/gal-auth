@@ -72,9 +72,9 @@ func GetContextUser(ctx context.Context) *model.UserData {
 	return user
 }
 
-func TokenFactory(apiSecret string, duration time.Duration) func(user *model.UserData) (string, error) {
+func TokenFactory(apiSecret string, duration time.Duration) func(user *model.TokenData) (string, error) {
 	secret := []byte(apiSecret)
-	return func(user *model.UserData) (string, error) {
+	return func(user *model.TokenData) (string, error) {
 		claims := jwt.MapClaims{}
 		claims["user"] = user
 		if duration > time.Nanosecond*0 {

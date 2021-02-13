@@ -27,11 +27,15 @@ type Profile struct {
 }
 
 type UserData struct {
-	ID               string
-	Profile          Profile
-	IsSuperUser      bool
-	AccessTo         map[string]ProjectSettings
-	Identities       map[string]Identity
+	ID          string
+	Profile     Profile
+	IsSuperUser bool
+	AccessTo    map[string]ProjectSettings
+	Identities  map[string]Identity
+}
+
+type TokenData struct {
+	*UserData
 	ThirdPartyTokens map[string]interface{}
 }
 
