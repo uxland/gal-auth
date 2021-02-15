@@ -16,6 +16,7 @@ func MiddlewareFactory(apiSecret string) func(handler http.Handler) http.Handler
 			authHeader := r.Header.Get(shared.AuthorizationHeader)
 			if authHeader == "" {
 				next.ServeHTTP(w, r)
+				return
 			}
 
 			tokenSplit := strings.Split(authHeader, " ")
