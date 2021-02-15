@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func MiddlewareFactory(apiSecret string, scheme shared.AuthenticationScheme) func(handler http.Handler) http.Handler {
+func MiddlewareFactory(apiSecret string) func(handler http.Handler) http.Handler {
 	secret := []byte(apiSecret)
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -17,15 +17,24 @@ func MiddlewareFactory(apiSecret string, scheme shared.AuthenticationScheme) fun
 			if authHeader == "" {
 				next.ServeHTTP(w, r)
 			}
+
 			tokenSplit := strings.Split(authHeader, " ")
-			bearer := tokenSplit[1]
-			token, err := shared.VerifyToken(bearer, secret)
-			if err != nil {
-				w.WriteHeader(http.StatusUnauthorized)
-				w.Write([]byte("Unauthorized"))
-				return
+
+			scheme := tokenSplit[0]
+			auth := tokenSplit[1]
+
+			ctx := shared.SetAuthenticationToContext(r.Context(), &shared.AuthorizationType{Value: auth, Scheme: scheme})
+
+			if scheme == shared.BearerSchema {
+				token, err := shared.VerifyToken(auth, secret)
+				if err != nil {
+					w.WriteHeader(http.StatusUnauthorized)
+					_, _ = w.Write([]byte("Unauthorized"))
+					return
+				}
+				ctx = shared.SetClaimsForContext(ctx, token)
 			}
-			ctx := shared.SetClaimsForContext(r.Context(), token)
+
 			r.WithContext(ctx)
 			next.ServeHTTP(w, r)
 		})

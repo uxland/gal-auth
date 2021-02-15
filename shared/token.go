@@ -13,6 +13,8 @@ var userCtxKey = "ctx-user-data"
 
 var tokenKey = "ctx-auth-token"
 
+var authorizationKey = "ctx-authorization"
+
 func deserializeUserData(claims *jwt.MapClaims) (*model.UserData, error) {
 	var data map[string]interface{} = *claims
 	user, b := data["user"]
@@ -56,6 +58,19 @@ func SetClaimsForContext(ctx context.Context, claims *jwt.MapClaims) context.Con
 	}
 	return setUserForContext(ctx, userData)
 }
+
+func SetAuthenticationToContext(ctx context.Context, authorizationType *AuthorizationType) context.Context {
+	return context.WithValue(ctx, authorizationKey, authorizationType)
+}
+
+func GetAuthenticationFromContext(ctx context.Context) *AuthorizationType {
+	auth, exists := ctx.Value(authorizationKey).(*AuthorizationType)
+	if !exists {
+		return nil
+	}
+	return auth
+}
+
 func GetContextData(ctx context.Context) map[string]interface{} {
 	claims, exists := ctx.Value(tokenKey).(*jwt.MapClaims)
 	if !exists || claims == nil {
