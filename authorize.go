@@ -36,6 +36,11 @@ func getField(data map[string]interface{}, fieldName string) (interface{}, bool)
 	return nil, false
 }
 
+func GetUserDataFromContext(ctx context.Context) *model.UserData {
+	data, _, _ := getUserData(ctx)
+	return data
+}
+
 func getUserData(ctx context.Context) (*model.UserData, map[string]interface{}, bool) {
 	u := shared.GetContextUser(ctx)
 	if u != nil {
