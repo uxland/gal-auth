@@ -37,7 +37,7 @@ func MiddlewareFactory(apiSecret string) func(handler http.Handler) http.Handler
 				ctx = shared.SetClaimsForContext(ctx, token)
 			}
 
-			r.WithContext(ctx)
+			r = r.WithContext(ctx)
 			next.ServeHTTP(w, r)
 		})
 	}
