@@ -36,12 +36,12 @@ func getField(data map[string]interface{}, fieldName string) (interface{}, bool)
 	return nil, false
 }
 
-func GetUserDataFromContext(ctx context.Context) *model.UserData {
+func GetUserDataFromContext(ctx context.Context) *model.TokenData {
 	data, _, _ := getUserData(ctx)
 	return data
 }
 
-func getUserData(ctx context.Context) (*model.UserData, map[string]interface{}, bool) {
+func getUserData(ctx context.Context) (*model.TokenData, map[string]interface{}, bool) {
 	u := shared.GetContextUser(ctx)
 	if u != nil {
 		return u, nil, true
@@ -61,7 +61,7 @@ func getUserData(ctx context.Context) (*model.UserData, map[string]interface{}, 
 	return nil, user, true
 }
 
-func isSuperUser(user *model.UserData, mapUser map[string]interface{}) bool {
+func isSuperUser(user *model.TokenData, mapUser map[string]interface{}) bool {
 	if user != nil {
 		return user.IsSuperUser
 	}

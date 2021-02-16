@@ -15,7 +15,7 @@ var tokenKey = "ctx-auth-token"
 
 var authorizationKey = "ctx-authorization"
 
-func deserializeUserData(claims *jwt.MapClaims) (*model.UserData, error) {
+func deserializeUserData(claims *jwt.MapClaims) (*model.TokenData, error) {
 	var data map[string]interface{} = *claims
 	user, b := data["user"]
 	if !b {
@@ -25,7 +25,7 @@ func deserializeUserData(claims *jwt.MapClaims) (*model.UserData, error) {
 	if err != nil {
 		return nil, err
 	}
-	u := &model.UserData{}
+	u := &model.TokenData{}
 	err = json.Unmarshal(bytes, u)
 	if err != nil {
 		return nil, err
@@ -47,7 +47,7 @@ func VerifyToken(token string, apiSecret []byte) (*jwt.MapClaims, error) {
 	}
 	return &claims, tokenError
 }
-func setUserForContext(ctx context.Context, user *model.UserData) context.Context {
+func setUserForContext(ctx context.Context, user *model.TokenData) context.Context {
 	return context.WithValue(ctx, userCtxKey, user)
 }
 func SetClaimsForContext(ctx context.Context, claims *jwt.MapClaims) context.Context {
@@ -79,8 +79,8 @@ func GetContextData(ctx context.Context) map[string]interface{} {
 	return *claims
 }
 
-func GetContextUser(ctx context.Context) *model.UserData {
-	user, exists := ctx.Value(userCtxKey).(*model.UserData)
+func GetContextUser(ctx context.Context) *model.TokenData {
+	user, exists := ctx.Value(userCtxKey).(*model.TokenData)
 	if !exists || user == nil {
 		return nil
 	}
