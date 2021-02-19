@@ -166,3 +166,8 @@ func AssertIsSuperUser(ctx context.Context) error {
 	}
 	return nil
 }
+
+func IsContextAuthenticated(ctx context.Context) bool {
+	_, _, b := getUserData(ctx)
+	return b
+}
