@@ -25,18 +25,12 @@ func MiddlewareFactory(apiSecret string) func(handler http.Handler) http.Handler
 			scheme := tokenSplit[0]
 			auth := tokenSplit[1]
 
-			ctx := shared.SetAuthenticationToContext(r.Context(), &shared.AuthorizationType{Value: auth, Scheme: scheme})
-
-			if scheme == shared.BearerSchema {
-				token, err := shared.VerifyToken(auth, secret)
-				if err != nil {
-					w.WriteHeader(http.StatusUnauthorized)
-					_, _ = w.Write([]byte("Unauthorized"))
-					return
-				}
-				ctx = shared.SetClaimsForContext(ctx, token)
+			ctx, err := shared.AuthenticateInputToken(r.Context(), scheme, auth, secret)
+			if err != nil {
+				w.WriteHeader(http.StatusUnauthorized)
+				_, _ = w.Write([]byte("Unauthorized"))
+				return
 			}
-
 			r = r.WithContext(ctx)
 			next.ServeHTTP(w, r)
 		})

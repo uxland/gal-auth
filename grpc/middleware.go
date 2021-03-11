@@ -18,15 +18,7 @@ func MiddlewareFactory(apiSecret string, schemes ...shared.AuthenticationScheme)
 			if err != nil || token == "" {
 				continue
 			}
-			ctx = shared.SetAuthenticationToContext(ctx, &shared.AuthorizationType{Scheme: scheme, Value: token})
-			if scheme == shared.BearerSchema {
-				claims, err := shared.VerifyToken(token, apiSecretBytes)
-				if err != nil {
-					return nil, err
-				}
-				ctx = shared.SetClaimsForContext(ctx, claims)
-			}
-			return ctx, nil
+			return shared.AuthenticateInputToken(ctx, scheme, token, apiSecretBytes)
 		}
 		return ctx, nil
 	}

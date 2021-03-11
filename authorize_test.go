@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-func createUser() model.UserData {
+func createUser() model.TokenData {
 	user := model.UserData{
 		Profile: model.Profile{
 			FullName:  "test user",
@@ -33,14 +33,17 @@ func createUser() model.UserData {
 			"SAP": {UserID: "tt", ProviderID: "SAP"},
 		},
 	}
-	return user
+	return model.TokenData{
+		UserData:         &user,
+		ThirdPartyTokens: nil,
+	}
 }
 
 const (
 	testApiSecret = "my-api-secret"
 )
 
-func setContext(user *model.UserData) (context.Context, error) {
+func setContext(user *model.TokenData) (context.Context, error) {
 	middleware := grpc.MiddlewareFactory(testApiSecret, shared.BearerSchema)
 	tokenFactory := shared.TokenFactory(testApiSecret, time.Hour)
 
